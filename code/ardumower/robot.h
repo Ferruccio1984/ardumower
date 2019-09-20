@@ -75,6 +75,8 @@ enum {
   SEN_MOTOR_MOW,         // 0..MAX_MOW_CURRENT
   SEN_BUMPER_LEFT,       // LOW = pressed
   SEN_BUMPER_RIGHT,      // LOW = pressed
+  SEN_BUMPER_FRONT,
+  SEN_BUMPER_BACK,
   SEN_DROP_LEFT,       // LOW = pressed                                                                                                  // Dropsensor - Absturzsensor
   SEN_DROP_RIGHT,      // LOW = pressed                                                                                                  // Dropsensor - Absturzsensor  
   SEN_SONAR_CENTER,      // 0..SONAR_TRIGGER_DISTANCE
@@ -333,6 +335,10 @@ class Robot
     boolean bumperLeft ;          
     int bumperRightCounter ;
     boolean bumperRight ;
+    boolean bumperFront ;
+    int bumperFrontCounter ;
+    boolean bumperBack ;
+    int bumperBackCounter ;
     unsigned long nextTimeBumper ;
     // --------- free wheel state ---------------------
     boolean freeWheelUse; // has free wheel sensor?
@@ -535,6 +541,11 @@ class Robot
     boolean rmcsTriggerIMU;
     boolean rmcsTriggerFreeWheel;
     boolean rmcsTriggerRain;
+
+
+    //Servo thr_left;
+    //Servo thr_right;
+    
     // --------------------------------------------------
     Robot();
     // robot setup
@@ -665,7 +676,8 @@ protected:
     virtual void processRMCSCommand(String command);
     virtual void rmcsPrintInfo(Stream &s); 
     virtual void rmcsSendState(Stream &s);
-    virtual void rmcsSendBumper(Stream &s, char triggerleft, char triggerright, char triggercenter);
+   // virtual void rmcsSendBumper(Stream &s, char triggerleft, char triggerright, char triggercenter);
+    virtual void rmcsSendBumper(Stream &s, char triggerleft, char triggerright, char triggerfront, char triggerback);
     virtual void rmcsSendSonar(Stream &s, char triggerleft, char triggerright, char triggercenter );
     virtual void rmcsSendPerimeter(Stream &s);
     virtual void rmcsSendGPS(Stream &s);

@@ -46,7 +46,8 @@
 // NOTE for Arduino Due:  use native USB port for programming and console!
 
 
-void setup()  {     
+void setup()  { 
+  delay(3000);    
   robot.setup();
 } 
 

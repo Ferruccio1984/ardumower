@@ -23,8 +23,8 @@
 
 #include "gps.h"
 
-#define _GPRMC_TERM   "GPRMC"
-#define _GPGGA_TERM   "GPGGA"
+#define _GPRMC_TERM   "GNRMC"
+#define _GPGGA_TERM   "GNGGA"
 
 GPS::GPS()
   :  _time(GPS_INVALID_TIME)

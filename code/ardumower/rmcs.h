@@ -33,7 +33,7 @@ void Robot::rmcsPrintInfo(Stream &s){
 	}	
   if (durationSinceLastSendBumper > RMCS_interval_bumper and bumperUse && RMCS_interval_bumper != 0){
     rmcsInfoLastSendBumper = now;
-    rmcsSendBumper(s,0,0,0);
+    rmcsSendBumper(s,0,0,0,0);
 	}	
 
   if (durationSinceLastSendOdometry > RMCS_interval_odometry and odometryUse && RMCS_interval_odometry != 0){
@@ -105,16 +105,19 @@ void Robot::rmcsSendSonar(Stream &s, char triggerleft, char triggerright, char t
     Streamprint(s, "\r\n"); 
 }
 
-void Robot::rmcsSendBumper(Stream &s, char triggerleft, char triggerright, char triggercenter){
+void Robot::rmcsSendBumper(Stream &s, char triggerleft, char triggerright, char triggerfront, char triggerback){
   
     // ROBOT bumper data, Timestamp, bumper left value, bumper right value, bumper center value, bumper left trigger, bumper right trigger, bumper center trigger
     Streamprint(s, "$RMBUM,%6u,", (millis()-stateStartTime)/1000);                      
     Streamprint(s, "%4d ,",bumperLeftCounter);                   
     Streamprint(s, "%4d ,",bumperRightCounter);
+    Streamprint(s, "%4d ,",bumperFrontCounter);                   
+    Streamprint(s, "%4d ,",bumperBackCounter);
     Streamprint(s, "%4d ,",0);                
     Streamprint(s, "%4d ,",triggerleft);           
     Streamprint(s, "%4d ,",triggerright); 
-    Streamprint(s, "%4d ",triggercenter);
+    Streamprint(s, "%4d ",triggerfront);
+    Streamprint(s, "%4d ",triggerback);
     Streamprint(s, "\r\n"); 
 }
 
@@ -340,7 +343,7 @@ void Robot::processRMCSCommand(String command){
         // trigger once
         if (frequency == -1)
         {
-           rmcsSendBumper(Console,0,0,0);
+           rmcsSendBumper(Console,0,0,0,0);
         }
         else{
           if (frequency > 0)
@@ -542,14 +545,28 @@ void Robot::processRMCSCommand(String command){
         case SEN_BUMPER_LEFT:
         if (rmcsTriggerBumper)
         {
-          rmcsSendBumper(Console,1,0,0);
+          rmcsSendBumper(Console,1,0,0,0);
         }
         break; 
 
         case SEN_BUMPER_RIGHT:
         if (rmcsTriggerBumper)
         {
-          rmcsSendBumper(Console,0,1,0);
+          rmcsSendBumper(Console,0,1,0,0);
+        }
+        break; 
+
+        case SEN_BUMPER_FRONT:
+        if (rmcsTriggerBumper)
+        {
+          rmcsSendBumper(Console,0,0,1,0);
+        }
+        break; 
+
+        case SEN_BUMPER_BACK:
+        if (rmcsTriggerBumper)
+        {
+          rmcsSendBumper(Console,0,0,0,1);
         }
         break; 
       

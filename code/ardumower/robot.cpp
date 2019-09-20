@@ -39,7 +39,7 @@ const char* stateNames[] ={"OFF ", "ROS", "RC  ", "FORW", "ROLL", "REV ", "CIRC"
   "STREV", "STROL", "STFOR", "MANU", "ROLW", "POUTFOR", "POUTREV", "POUTROLL", "TILT", "BUMPREV", "BUMPFORW"};
 
 const char* sensorNames[] ={"SEN_PERIM_LEFT", "SEN_PERIM_RIGHT", "SEN_PERIM_LEFT_EXTRA", "SEN_PERIM_RIGHT_EXTRA", "SEN_LAWN_FRONT", "SEN_LAWN_BACK", 
-	"SEN_BAT_VOLTAGE", "SEN_CHG_CURRENT", "SEN_CHG_VOLTAGE", "SEN_MOTOR_LEFT", "SEN_MOTOR_RIGHT", "SEN_MOTOR_MOW", "SEN_BUMPER_LEFT", "SEN_BUMPER_RIGHT", 
+	"SEN_BAT_VOLTAGE", "SEN_CHG_CURRENT", "SEN_CHG_VOLTAGE", "SEN_MOTOR_LEFT", "SEN_MOTOR_RIGHT", "SEN_MOTOR_MOW", "SEN_BUMPER_LEFT", "SEN_BUMPER_RIGHT", "SEN_BUMPER_FRONT", "SEN_BUMPER_BACK",
 	"SEN_DROP_LEFT", "SEN_DROP_RIGHT", "SEN_SONAR_CENTER", "SEN_SONAR_LEFT", "SEN_SONAR_RIGHT", "SEN_BUTTON", "SEN_IMU", "SEN_MOTOR_MOW_RPM", "SEN_RTC",
   "SEN_RAIN", "SEN_TILT", "SEN_FREE_WHEEL"};
 
@@ -127,7 +127,9 @@ Robot::Robot(){
   lastTimeMotorMowStuck = 0;
 
   bumperLeftCounter = bumperRightCounter = 0;
-  bumperLeft = bumperRight = false;          
+  bumperFrontCounter = bumperBackCounter = 0;
+  bumperLeft = bumperRight = false; 
+  bumperFront = bumperBack = false;         
    
    dropLeftCounter = dropRightCounter = 0;                                                                                              // Dropsensor - Absturzsensor
    dropLeft = dropRight = false;                                                                                                        // Dropsensor - Absturzsensor
@@ -278,7 +280,9 @@ void Robot::setUserSwitches(){
   setActuator(ACT_USER_SW3, userSwitch3);     
 }
 
-void Robot::setup()  {     
+void Robot::setup()  { 
+  //thr_left.attach(pinMotorLeftPWM);
+  //thr_right.attach(pinMotorRightPWM);     
   setDefaultTime();
   setMotorPWM(0, 0, false);
   loadSaveErrorCounters(true);
@@ -551,14 +555,34 @@ void Robot::readSensors(){
       bumperLeftCounter++;
 			setSensorTriggered(SEN_BUMPER_LEFT);
       bumperLeft=true;
-    }
-
-    if (readSensor(SEN_BUMPER_RIGHT) == 0) {
+      
+    }else if(readSensor(SEN_BUMPER_RIGHT) == 0){
       bumperRightCounter++;
-			setSensorTriggered(SEN_BUMPER_RIGHT);
+      setSensorTriggered(SEN_BUMPER_RIGHT);
       bumperRight=true;
-    } 
-  }
+      
+    } else{
+      bumperLeft=false;
+      bumperRight=false;
+    }
+    
+     if(readSensor(SEN_BUMPER_FRONT) == 0){
+      bumperFrontCounter++;
+      setSensorTriggered(SEN_BUMPER_FRONT);
+      bumperFront=true;         
+     } else if(readSensor(SEN_BUMPER_BACK) == 0){
+      bumperBackCounter++;
+      setSensorTriggered(SEN_BUMPER_BACK);
+      bumperBack=true;      
+    }else {
+      bumperFront=false;
+      bumperBack=false;
+    }
+  
+   
+   
+    
+    }
 
 
   if ((dropUse) && (millis() >= nextTimeDrop)){                                                                          // Dropsensor - Absturzsensor
@@ -835,7 +859,14 @@ void Robot::checkBumpers(){
       } else {
         reverseOrBidirBumper(LEFT);
       }    
-  }  
+  }  else if ((bumperFront || bumperBack)){
+    if (bumperFront) {
+        reverseOrBidirBumper(RIGHT);          
+      } else {
+        reverseOrBidirBumper(RIGHT);
+      }    
+  }
+  
 }
 
 // check free wheel

@@ -63,6 +63,8 @@ choose your robot type, PCB version, baud rates, pin definitions etc.
     
 #define pinBumperLeft 39           // bumper pins
 #define pinBumperRight 38
+#define pinBumperFront 18
+#define pinBumperBack  19
 
 #define pinDropLeft 45           // drop pins                                                                                          Dropsensor - Absturzsensor
 #define pinDropRight 23          // drop pins                                                                                          Dropsensor - Absturzsensor

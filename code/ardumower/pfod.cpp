@@ -447,10 +447,14 @@ void RemoteControl::sendBumperMenu(boolean update){
   if (update) serialPort->print("{:"); else serialPort->print(F("{.BumperDuino`1000"));  
   serialPort->print(F("|b00~Use bumper "));
   sendYesNo(robot->bumperUse);    
-  serialPort->println(F("|b01~Bumper counter l, r "));
+  serialPort->println(F("|b01~Bumper counter l, r, f, b "));
   serialPort->print(robot->bumperLeftCounter);
   serialPort->print(", ");
   serialPort->print(robot->bumperRightCounter);
+  serialPort->print(", ");
+  serialPort->print(robot->bumperFrontCounter);
+  serialPort->print(", ");
+  serialPort->print(robot->bumperBackCounter);
   serialPort->println(F("|b02~Bumper value l, r "));
   serialPort->print(robot->bumperLeft);
   serialPort->print(", ");
@@ -557,7 +561,8 @@ void RemoteControl::sendPerimeterMenu(boolean update){
   sendSlider("e16", F("Perimeter tracking roll time"), robot->perimeterTrackRollTime, "", 1, 8000); 
   sendSlider("e17", F("Perimeter tracking reverse time"), robot->perimeterTrackRevTime, "", 1, 8000); 
   sendSlider("e11", F("Transition timeout"), robot->trackingPerimeterTransitionTimeOut, "", 1, 10000);
-  sendSlider("e12", F("Track error timeout"), robot->trackingErrorTimeOut, "", 1, 10000);             
+  sendSlider("e12", F("Track error timeout"), robot->trackingErrorTimeOut, "", 1, 10000); 
+  sendSlider("e09", F("Max_speed_perimeter"), robot->MaxSpeedperiPwm, "", 1, 255);             
   sendPIDSlider("e07", F("Track"), robot->perimeterPID, 0.1, 100);  
   //serialPort->print(F("|e09~Use differential signal "));
   //sendYesNo(robot->perimeter.useDifferentialPerimeterSignal);    
@@ -583,7 +588,7 @@ void RemoteControl::processPerimeterMenu(String pfodCmd){
     else if (pfodCmd.startsWith("e17")) processSlider(pfodCmd, robot->perimeterTrackRevTime, 1);
     else if (pfodCmd.startsWith("e07")) processPIDSlider(pfodCmd, "e07", robot->perimeterPID, 0.1, 100);    
     else if (pfodCmd.startsWith("e08")) processSlider(pfodCmd, robot->perimeter.timedOutIfBelowSmag, 1);    
-    //else if (pfodCmd.startsWith("e09")) robot->perimeter.useDifferentialPerimeterSignal = !robot->perimeter.useDifferentialPerimeterSignal;
+    else if (pfodCmd.startsWith("e09")) processSlider(pfodCmd, robot->MaxSpeedperiPwm, 1); 
     else if (pfodCmd.startsWith("e10")) robot->perimeter.swapCoilPolarity = !robot->perimeter.swapCoilPolarity;
     else if (pfodCmd.startsWith("e11")) processSlider(pfodCmd, robot->trackingPerimeterTransitionTimeOut, 1);
     else if (pfodCmd.startsWith("e12")) processSlider(pfodCmd, robot->trackingErrorTimeOut, 1);
@@ -1320,6 +1325,10 @@ void RemoteControl::run(){
       serialPort->print(robot->bumperLeftCounter);
       serialPort->print(",");
       serialPort->print(robot->bumperRightCounter);
+      serialPort->print(",");
+      serialPort->print(robot->bumperFrontCounter);
+      serialPort->print(",");
+      serialPort->print(robot->bumperBackCounter);
       serialPort->print(",");
       serialPort->print(robot->sonarDistCounter);
       serialPort->print(",");

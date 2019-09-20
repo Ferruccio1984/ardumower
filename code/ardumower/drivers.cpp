@@ -145,6 +145,40 @@ void setL298N(int pinDir, int pinPWM, int speed){
   }
 }
 
+/*
+// Brushless motor driver
+// 
+//(8-bit PWM=255, 10-bit PWM=1023)
+// IN1 PinPWM         IN2 PinDir
+// PWM                L     Forward
+// nPWM               H     Reverse
+void setBL_ESC(int pinDir, int pinPWM, int speed){
+  if(speed == 0){
+    if(pinPWM == pinMotorLeftPWM){
+      robot.thr_left.writeMicroseconds(1500);
+    }else if(pinPWM == pinMotorRightPWM){
+      robot.thr_right.writeMicroseconds(1500);
+    } 
+    
+  }else if(speed < 0){
+     if(pinPWM == pinMotorLeftPWM){
+      int thr_l_out = map(-speed,0,255,0,500);
+      robot.thr_left.writeMicroseconds(1500-thr_l_out);
+    }else if(pinPWM == pinMotorRightPWM){
+      int thr_r_out = map(-speed,0,255,0,500);
+      robot.thr_right.writeMicroseconds(1500-thr_r_out);
+    }
+    } else {
+    if(pinPWM == pinMotorLeftPWM){
+      int thr_l_out = map(speed,0,255,0,500);
+      robot.thr_left.writeMicroseconds(1500+thr_l_out);
+    }else if(pinPWM == pinMotorRightPWM){
+      int thr_r_out = map(speed,0,255,0,500);
+      robot.thr_right.writeMicroseconds(1500+thr_r_out);
+    }
+  }
+}
+*/
 // DFRobot Romeo All in one V1.1 motor driver
 // D5/D6 PinPWM       D4/D7 PinDir
 // H                  L     Forward

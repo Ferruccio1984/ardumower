@@ -108,7 +108,7 @@ Mower::Mower(){
 	sonarSlowBelow             = 100;     // ultrasonic sensor slow down distance
   
   // ------ perimeter ---------------------------------
-  perimeterUse               = 0;          // use perimeter?    
+  perimeterUse               = 1;          // use perimeter?    
   perimeterTriggerTimeout    = 0;          // perimeter trigger timeout when escaping from inside (ms)  
   perimeterOutRollTimeMax    = 2000;       // roll time max after perimeter out (ms)
   perimeterOutRollTimeMin    = 750;        // roll time min after perimeter out (ms)
@@ -128,19 +128,32 @@ Mower::Mower(){
   trackingPerimeterTransitionTimeOut              = 2500;   // never<500 ms
   trackingErrorTimeOut                            = 10000;  // 0=disable
   trackingBlockInnerWheelWhilePerimeterStruggling = 1;
-  MaxSpeedperiPwm = 200; // speed max in PWM while perimeter tracking
+  #if defined (ROBOT_ARDUMOWER)
+    MaxSpeedperiPwm = 255; // speed max in PWM while perimeter tracking
+  #else // ROBOT_MINI
+    MaxSpeedperiPwm = 127;
+  #endif
   // ------ lawn sensor --------------------------------
   lawnSensorUse     = 0;                   // use capacitive lawn Sensor
   
   // ------  IMU (compass/accel/gyro) ----------------------
   imuUse                     = 1;          // use IMU?
   imuCorrectDir              = 0;          // correct direction by compass?
-  imuDirPID.Kp               = 5.0;        // direction PID controller
-  imuDirPID.Ki               = 1.0;
-  imuDirPID.Kd               = 1.0;    
-  imuRollPID.Kp              = 0.8;        // roll PID controller
-  imuRollPID.Ki              = 21;
-  imuRollPID.Kd              = 0;  
+  #if defined (ROBOT_ARDUMOWER)
+    imuDirPID.Kp               = 5.0;        // direction PID controller
+    imuDirPID.Ki               = 1.0;
+    imuDirPID.Kd               = 1.0;    
+    imuRollPID.Kp              = 0.8;        // roll PID controller
+    imuRollPID.Ki              = 21;
+    imuRollPID.Kd              = 0;  
+  #else  // ROBOT_MINI
+    imuDirPID.Kp               = 1.2;        // direction PID controller
+    imuDirPID.Ki               = 2.2;
+    imuDirPID.Kd               = 0.8;    
+    imuRollPID.Kp              = 1.3;        // roll PID controller
+    imuRollPID.Ki              = 2.2;
+    imuRollPID.Kd              = 0.8;  
+  #endif 
   
   // ------ model R/C ------------------------------------
   remoteUse                  = 1;          // use model remote control (R/C)?
@@ -201,7 +214,7 @@ Mower::Mower(){
 	#endif
 		
   #if defined (PCB_1_3)    
-		#define DIVIDER_DIP_SWITCH  2             //  sets used PCB odometry divider (2=DIV/2, 4=DIV/4, 8=DIV/8, etc.) 
+		#define DIVIDER_DIP_SWITCH  1             //  sets used PCB odometry divider (2=DIV/2, 4=DIV/4, 8=DIV/8, etc.) 
 		odometryTicksPerRevolution /= DIVIDER_DIP_SWITCH;        // encoder ticks per one full resolution 
   #endif
   odometryTicksPerCm         = ((float)odometryTicksPerRevolution) / (((float)wheelDiameter)/10.0) / (3.1415);    // computes encoder ticks per cm (do not change)
@@ -236,7 +249,7 @@ Mower::Mower(){
   statsBatteryChargingCapacityTotal = 30000;
   
   // ------------robot mower communication standard---
-  rmcsUse					= false;   // if set robot mower communication standard (NMEA) is used.
+  rmcsUse					= true;   // if set robot mower communication standard (NMEA) is used.
   RMCS_interval_state	  	= 1000;  // default update interval in ms
   RMCS_interval_motor_current = 1000;
   RMCS_interval_sonar 		= 1000;
@@ -410,6 +423,10 @@ void Mower::setup(){
   pinMode(pinBumperLeft, INPUT_PULLUP);
   pinMode(pinBumperRight, INPUT);
   pinMode(pinBumperRight, INPUT_PULLUP);
+  pinMode(pinBumperFront, INPUT);
+  pinMode(pinBumperFront, INPUT_PULLUP);
+  pinMode(pinBumperBack, INPUT);
+  pinMode(pinBumperBack, INPUT_PULLUP);
   pinMode(pinTilt, INPUT);
   pinMode(pinTilt, INPUT_PULLUP);
 
@@ -623,7 +640,8 @@ int Mower::readSensor(char type){
 //bumper----------------------------------------------------------------------------------------------------
     case SEN_BUMPER_RIGHT: return(digitalRead(pinBumperRight)); break;
     case SEN_BUMPER_LEFT: return(digitalRead(pinBumperLeft)); break;      
-
+    case SEN_BUMPER_FRONT: return(digitalRead(pinBumperFront));break;
+    case SEN_BUMPER_BACK: return(digitalRead(pinBumperBack));break;
 //tilt----------------------------------------------------------------------------------------------------
     case SEN_TILT: return(digitalRead(pinTilt)); break;      
     

@@ -317,6 +317,8 @@ void Robot::printSettingSerial(){
   Console.println(trackingPerimeterTransitionTimeOut);
   Console.print  (F("trackingErrorTimeOut                       : "));
   Console.println(trackingErrorTimeOut);
+  Console.print  (F("max_perimeter_speed                        : "));
+  Console.println(MaxSpeedperiPwm);
   Console.print  (F("trackingBlockInnerWheelWhilePerimeterStruggling : "));
   Console.println(trackingBlockInnerWheelWhilePerimeterStruggling,1);
 
